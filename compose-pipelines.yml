@@ -1,0 +1,12 @@
+services:
+  pipeline-mqtt-redis:
+    container_name: pipeline-mqtt-redis
+    image: docker.redpanda.com/redpandadata/connect:latest
+    command: run /pipelines/general/mqtt_redis.yaml
+    volumes:
+      - ./pipelines:/pipelines:ro
+
+networks:
+  default:
+    name: demonstrator
+    external: true

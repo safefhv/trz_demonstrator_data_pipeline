@@ -3,6 +3,12 @@ set -uo pipefail
 
 status=0
 
+echo "::: Stopping pipeline stack :::"
+if ! docker compose -p pipelines -f compose-pipelines.yml down; then
+  echo "Failed to stop pipeline stack" >&2
+  status=1
+fi
+
 echo "::: Stopping demonstrator stack :::"
 if ! docker compose -p demonstrator -f compose-demonstrator.yml down; then
   echo "Failed to stop demonstrator stack" >&2

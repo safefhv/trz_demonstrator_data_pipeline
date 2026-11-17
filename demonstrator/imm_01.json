@@ -1,7 +1,7 @@
 {
   "machine_name": "imm_01",
   "opcua_url": "opc.tcp://im-simulator:4840/",
-  "topic_root": "uns-v1/adm/segment01/productionline01/molding",
+  "topic_root": "uns-v1/demonstrator/segment01/productionline01/molding",
   "subscription_list": [
     { "node_id": "ns=2;s=IMM.Status.State", "description": "state" },
     { "node_id": "ns=2;s=IMM.Status.StateCode", "description": "state_code" },

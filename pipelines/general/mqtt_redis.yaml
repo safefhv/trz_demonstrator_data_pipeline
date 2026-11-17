@@ -1,0 +1,21 @@
+input:
+  mqtt:
+    urls:
+      - mqtt://mqtt-broker:1883
+    client_id: ${MQTT_CLIENT_ID:redis-bridge-connect-01}
+    topics:
+      - uns-v1/+/+/+/+/+/+/+
+    qos: 0
+
+pipeline:
+  processors:
+    - mapping: |
+        let parts = metadata("mqtt_topic").split("/")
+        meta hash_name = "workcell:" + $parts.index(-2)
+        root = { $parts.index(-1): this.value.not_null().string() }
+
+output:
+  redis_hash:
+    url: redis://redis:6379
+    key: ${! metadata("hash_name") }
+    walk_json_object: true

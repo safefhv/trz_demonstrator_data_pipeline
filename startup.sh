@@ -34,3 +34,7 @@ echo "Core stack is up"
 echo "::: Starting demonstrator stack :::"
 docker compose -p demonstrator -f compose-demonstrator.yml up -d
 echo "Demonstrator stack is up"
+
+echo "::: Starting pipeline stack :::"
+docker compose -p pipelines -f compose-pipelines.yml up -d
+echo "Pipelines stack is up"
