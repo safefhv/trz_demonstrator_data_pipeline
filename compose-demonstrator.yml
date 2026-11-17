@@ -25,14 +25,15 @@ services:
       - im-simulator
     restart: unless-stopped
 
-  #imm-client:
-  #  environment:
-  #    MQTT_BROKER: mqtt-broker
-  #    MQTT_PORT: '1883'
-  #  image: opcua-client:latest
-  #  restart: on-failure
-  #  volumes:
-  #  - ./demonstrator/imm_01.json:/app/config.json:ro
+  imm-client:
+    container_name: imm-client
+    image: opcua-client:latest
+    environment:
+      MQTT_BROKER: mqtt-broker
+      MQTT_PORT: '1883'
+    restart: on-failure
+    volumes:
+    - ./demonstrator/imm_01.json:/app/config.json:ro
     
 networks:
   default:

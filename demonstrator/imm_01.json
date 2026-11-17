@@ -1,0 +1,31 @@
+{
+  "machine_name": "imm_01",
+  "opcua_url": "opc.tcp://im-simulator:4840/",
+  "topic_root": "uns-v1/adm/segment01/productionline01/molding",
+  "subscription_list": [
+    { "node_id": "ns=2;s=IMM.Status.State", "description": "state" },
+    { "node_id": "ns=2;s=IMM.Status.StateCode", "description": "state_code" },
+    {
+      "node_id": "ns=2;s=IMM.Production.CycleTime",
+      "description": "cycle_time"
+    },
+    {
+      "node_id": "ns=2;s=IMM.Production.TargetCycleTime",
+      "description": "target_cycle_time"
+    },
+    { "node_id": "ns=2;s=IMM.Production.Order", "description": "order" },
+    { "node_id": "ns=2;s=IMM.Production.Article", "description": "article" },
+    {
+      "node_id": "ns=2;s=IMM.Process.InjectionTime",
+      "description": "injection_time"
+    },
+    {
+      "node_id": "ns=2;s=IMM.Process.PlasticizingTime",
+      "description": "plasticizing_time"
+    },
+    {
+      "node_id": "ns=2;s=IMM.Production.PartStatus",
+      "description": "part_status"
+    }
+  ]
+}
