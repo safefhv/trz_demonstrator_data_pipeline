@@ -6,6 +6,13 @@ services:
     volumes:
       - ./pipelines:/pipelines:ro
 
+  pipeline-performance-hydration:
+    container_name: pipeline-performance-hydration
+    image: docker.redpanda.com/redpandadata/connect:latest
+    command: run /pipelines/performance/hydration.yaml
+    volumes:
+      - ./pipelines:/pipelines:ro
+
 networks:
   default:
     name: demonstrator

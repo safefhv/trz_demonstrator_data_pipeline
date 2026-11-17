@@ -1,0 +1,38 @@
+input:
+  mqtt:
+    urls:
+      - mqtt://mqtt-broker:1883
+    topics:
+      - uns-v1/+/segment01/+/+/+/+/cycle_time
+    qos: 1
+
+pipeline:
+  processors:
+    - mapping: |
+        let workcell = metadata("mqtt_topic").split("/").index(-2)
+        meta workcell = $workcell
+        root.workcell = $workcell
+        root.plant = metadata("mqtt_topic").split("/").index(1)
+        root.segment = metadata("mqtt_topic").split("/").index(2)
+        root.productionLine = metadata("mqtt_topic").split("/").index(3)
+        root.cycle_time = this.value.number()
+        root.timestamp = this.timestamp
+    - branch:
+        processors:
+          - redis:
+              url: redis://redis:6379
+              command: hmget
+              args_mapping: root = [ "workcell:" + metadata("workcell"), "order", "article", "target_cycle_time", "plasticizing_time", "injection_time"]
+        result_map: |
+          root.order = this.index(0)
+          root.article = this.index(1)
+          root.target_cycle_time = this.index(2).number()
+          root.plasticizing_time = this.index(3).number()
+          root.injection_time = this.index(4).number()
+
+output:
+  redpanda:
+    seed_brokers:
+      - redpanda-0:9092
+    topic: data_product_performance
+    key: ${! metadata("workcell") }
