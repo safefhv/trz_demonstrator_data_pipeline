@@ -1,0 +1,42 @@
+services:
+  im-simulator:
+    container_name: im-simulator
+    image: im-simulator:latest
+    environment:
+      MACHINE_NAME: IMM-01
+    ports:
+      - "4841:4840"
+    restart: unless-stopped
+
+  gateway:
+    container_name: gateway
+    image: gateway:latest
+    environment:
+      OPCUA_URL: opc.tcp://im-simulator:4840/
+      MQTT_HOST: mqtt-broker
+      MQTT_PORT: "1883"
+      TOPIC_ROOT: uns-v1/adm/segment01/productionline01/molding
+      MACHINE_NAME: imm_01
+    ports:
+      - "8000:8000"
+    volumes:
+      - gateway_data:/data
+    depends_on:
+      - im-simulator
+    restart: unless-stopped
+
+  #imm-client:
+  #  environment:
+  #    MQTT_BROKER: mqtt-broker
+  #    MQTT_PORT: '1883'
+  #  image: opcua-client:latest
+  #  restart: on-failure
+  #  volumes:
+  #  - ./demonstrator/imm_01.json:/app/config.json:ro
+    
+networks:
+  default:
+    name: demonstrator
+    external: true
+volumes:
+  gateway_data: null

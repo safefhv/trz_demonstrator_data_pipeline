@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OPC UA → MQTT Gateway</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo" aria-hidden="true">⇄</span>
+      <div>
+        <h1>OPC UA → MQTT Gateway</h1>
+        <p class="sub">Browse the machine, pick tags, forward them to the broker</p>
+      </div>
+    </div>
+    <div class="chips">
+      <span class="chip" id="chip-opcua"><i></i>OPC UA</span>
+      <span class="chip" id="chip-mqtt"><i></i>MQTT</span>
+      <span class="chip" id="chip-fwd"><i></i>Forwarding</span>
+      <span class="counter"><b id="published">0</b> msgs sent</span>
+    </div>
+  </header>
+
+  <main>
+    <section class="card connection">
+      <form id="opcua-form" class="conn-block">
+        <h2>OPC UA server</h2>
+        <div class="row">
+          <input id="opcua-url" class="mono grow" placeholder="opc.tcp://host:4840/" spellcheck="false">
+          <button type="submit" class="primary">Connect</button>
+          <button type="button" id="disconnect">Disconnect</button>
+        </div>
+        <p class="hint" id="opcua-error"></p>
+      </form>
+      <form id="mqtt-form" class="conn-block">
+        <h2>MQTT broker &amp; topics</h2>
+        <div class="row wrap">
+          <label>Host<input id="mqtt-host" class="mono" spellcheck="false"></label>
+          <label class="narrow">Port<input id="mqtt-port" type="number" min="1" max="65535"></label>
+          <label class="grow">Topic root<input id="topic-root" class="mono" spellcheck="false"></label>
+          <label>Machine<input id="machine-name" class="mono" spellcheck="false"></label>
+          <label class="narrow">Interval ms<input id="interval" type="number" min="50" step="50"></label>
+          <label class="narrow">QoS
+            <select id="qos"><option>0</option><option>1</option><option>2</option></select>
+          </label>
+          <label class="check"><input id="retain" type="checkbox"> retain</label>
+          <button type="submit">Save</button>
+        </div>
+        <p class="hint" id="mqtt-error"></p>
+      </form>
+    </section>
+
+    <div class="grid">
+      <section class="card browser">
+        <div class="card-head">
+          <h2>Address space</h2>
+          <button id="reload-tree" class="ghost" title="Reload tree">↻</button>
+        </div>
+        <div id="tree" class="tree" role="tree"></div>
+      </section>
+
+      <section class="card details">
+        <div class="card-head"><h2>Node</h2></div>
+        <div id="details" class="details-body"><p class="empty">Select a node in the tree.</p></div>
+      </section>
+
+      <section class="card tags">
+        <div class="card-head">
+          <h2>Forwarded tags <span class="badge" id="tag-count">0</span></h2>
+          <div class="actions">
+            <a class="button ghost" href="/api/config" title="Download selection as client config">⤓ config</a>
+            <button id="clear-tags" class="ghost">Clear</button>
+            <button id="toggle-fwd" class="primary">Start forwarding</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Tag / topic</th><th class="num">Value</th><th>Updated</th><th></th></tr></thead>
+            <tbody id="tag-rows"></tbody>
+          </table>
+          <p class="empty" id="tags-empty">Tick variables in the address space to forward them.</p>
+        </div>
+      </section>
+
+      <section class="card log">
+        <div class="card-head">
+          <h2>MQTT messages</h2>
+          <span class="hint mono" id="status-topic"></span>
+        </div>
+        <div id="messages" class="messages mono"></div>
+      </section>
+    </div>
+  </main>
+
+  <div id="toast" class="toast" role="status"></div>
+  <script src="/static/app.js"></script>
+</body>
+</html>

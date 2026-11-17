@@ -1,0 +1,10 @@
+{
+    "machine_name": "simulation_machine_01",
+    "opcua_url": "opc.tcp://opcua-server:4840/",
+    "topic_root": "uns-v1/adm/segment01/productionline01",
+    "subscription_list": [
+        { "node_id": "ns=3;i=6", "description": "random_number" },
+        { "node_id": "ns=3;i=7", "description": "set_only_number" },
+        { "node_id": "ns=3;i=8", "description": "cycle_time" }
+    ]
+}
