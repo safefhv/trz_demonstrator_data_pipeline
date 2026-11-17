@@ -1,6 +1,7 @@
 import asyncio
 import json
 import os
+from datetime import datetime
 from asyncua import Client, ua
 
 import paho.mqtt.client as mqtt
@@ -19,6 +20,25 @@ def load_config():
         return json.load(file)
 
 
+def to_jsonable(value):
+    """Keep native JSON types (str, bool, int, float) as-is; stringify anything else."""
+    if value is None or isinstance(value, (bool, int, float, str)):
+        return value
+    if isinstance(value, datetime):
+        return value.isoformat()
+    if isinstance(value, ua.LocalizedText):
+        return value.Text
+    if isinstance(value, (list, tuple)):
+        return [to_jsonable(v) for v in value]
+    return str(value)
+
+
+def format_value(value):
+    if isinstance(value, float):
+        return f"{value:.2f}"
+    return repr(value)
+
+
 class SubscriptionHandler:
     def __init__(self, mqtt_client, topics, display_names):
         self.mqtt_client = mqtt_client
@@ -28,10 +48,10 @@ class SubscriptionHandler:
 
     def datachange_notification(self, node, value, data):
         source_timestamp = data.monitored_item.Value.SourceTimestamp
-        print(f"   [push] {node} = {value:.2f}   (source timestamp {source_timestamp})")
+        print(f"   [push] {node} = {format_value(value)}   (source timestamp {source_timestamp})")
 
         payload = {
-            "value": float(value),
+            "value": to_jsonable(value),
             "timestamp": source_timestamp.isoformat(),
             "node": self.display_names[node.nodeid]
         }
