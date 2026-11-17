@@ -13,6 +13,13 @@ services:
     volumes:
       - ./pipelines:/pipelines:ro
 
+  pipeline-performance-insert:
+    container_name: pipeline-performance-insert
+    image: docker.redpanda.com/redpandadata/connect:latest
+    command: run /pipelines/performance/insert.yaml
+    volumes:
+      - ./pipelines:/pipelines:ro
+
 networks:
   default:
     name: demonstrator

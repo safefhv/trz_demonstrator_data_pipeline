@@ -1,0 +1,43 @@
+input:
+  redpanda:
+    seed_brokers:
+      - redpanda-0:9092
+    topics:
+      - data_product_performance
+    consumer_group: performance
+    start_from_oldest: true
+
+output:
+  sql_insert:
+    driver: postgres
+    dsn: postgres://demonstrator:demonstrator@timescaledb:5432/postgres?sslmode=disable
+    table: data_product_performance
+    columns: 
+      - ts
+      - plant
+      - segment
+      - production_line
+      - workcell
+      - order_no
+      - article
+      - cycle_time
+      - target_cycle_time
+      - injection_time
+      - plasticizing_time
+    args_mapping: |
+      root = [
+        this.timestamp,
+        this.plant,
+        this.segment,
+        this.productionLine,
+        this.workcell,
+        this.order.catch(null),
+        this.article.catch(null),
+        this.cycle_time.number().catch(null),
+        this.target_cycle_time.number().catch(null),
+        this.injection_time.number().catch(null),
+        this.plasticizing_time.number().catch(null)
+      ]
+    batching:
+      count: 100
+      period: 15s
