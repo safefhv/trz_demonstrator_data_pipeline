@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Live Coding Guide&colon; &DiacriticalGrave;demo&lowbar;start&DiacriticalGrave; &rarr; &DiacriticalGrave;demo&lowbar;04&DiacriticalGrave;</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+<link href="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.css" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <span id="markdown-mermaid" aria-hidden="true" data-config="{&quot;darkModeTheme&quot;:&quot;vscode&quot;,&quot;lightModeTheme&quot;:&quot;vscode&quot;,&quot;maxTextSize&quot;:50000,&quot;clickDrag&quot;:&quot;alt&quot;,&quot;showControls&quot;:&quot;onHoverOrFocus&quot;,&quot;resizable&quot;:true,&quot;maxHeight&quot;:&quot;&quot;}"></span>
+				<h1 id="live-coding-guide-demo_start--demo_04">Live Coding Guide: <code>demo_start</code> → <code>demo_04</code></h1>
+<p>Builds the data pipeline step by step:</p>
+<pre><code>IM simulator ──OPC UA──► opc-ua client ──MQTT──► mqtt-broker ──► Redis (current state)
+                                                      │                │ lookup
+                                                      └──► hydration ◄─┘
+                                                              │
+                                                          Redpanda (data_product_performance)
+                                                              │
+                                                           insert ──► TimescaleDB
+</code></pre>
+<p>Each step matches a branch. To catch up or reset at any point: <code>git checkout demo_0X</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Branch</th>
+<th>Topic</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td><code>demo_start</code></td>
+<td>Baseline: core stack, simulator, gateway</td>
+</tr>
+<tr>
+<td>1</td>
+<td><code>demo_01</code></td>
+<td>OPC UA → MQTT (automated client)</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>demo_02</code></td>
+<td>MQTT → Redis (current-state bridge)</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>demo_03</code></td>
+<td>Hydration: MQTT + Redis → Redpanda</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>demo_04</code></td>
+<td>Redpanda → TimescaleDB</td>
+</tr>
+</tbody>
+</table>
+<h3 id="uis-used-during-the-demo">UIs used during the demo</h3>
+<table>
+<thead>
+<tr>
+<th>Service</th>
+<th>URL</th>
+<th>Login</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Gateway (OPC UA)</td>
+<td><a href="http://localhost:8000">http://localhost:8000</a></td>
+<td>–</td>
+</tr>
+<tr>
+<td>RedisInsight</td>
+<td><a href="http://localhost:5540">http://localhost:5540</a></td>
+<td>–</td>
+</tr>
+<tr>
+<td>Redpanda Console</td>
+<td><a href="http://localhost:8080">http://localhost:8080</a></td>
+<td>–</td>
+</tr>
+<tr>
+<td>pgAdmin</td>
+<td><a href="http://localhost:5050">http://localhost:5050</a></td>
+<td><a href="mailto:admin@example.com">admin@example.com</a> / admin</td>
+</tr>
+<tr>
+<td>Grafana</td>
+<td><a href="http://localhost:3000">http://localhost:3000</a></td>
+<td>admin / admin</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="step-0-baseline-demo_start">Step 0: Baseline (<code>demo_start</code>)</h2>
+<p><strong>What is already there</strong></p>
+<ul>
+<li><code>compose-core.yml</code>: Redis (with volume <code>demonstrator_redis</code>), RedisInsight, Mosquitto, Redpanda + Console, TimescaleDB, pgAdmin, Grafana.</li>
+<li><code>compose-demonstrator.yml</code>: <code>im-simulator</code> (OPC UA server, port 4841 on the host) and <code>gateway</code> (web UI for browsing nodes and calling methods). The <code>imm-client</code> service is present but <strong>commented out</strong>.</li>
+<li><code>demonstrator/opc_ua_client/client.py</code>: the generic OPC UA → MQTT client. It reads a JSON config, subscribes to the listed nodes and publishes each change as <code>{&quot;value&quot;, &quot;timestamp&quot;, &quot;node&quot;}</code> (retained) to <code>&lt;topic_root&gt;/&lt;machine&gt;/&lt;machine&gt;/&lt;description&gt;</code>.</li>
+<li><code>startup.sh</code> / <code>shutdown.sh</code>: build missing images, create the <code>demonstrator</code> network, start core, then the demonstrator stack.</li>
+</ul>
+<p><strong>Prepare</strong></p>
+<pre><code class="language-bash">git checkout demo_start
+./startup.sh
+</code></pre>
+<p><strong>Show</strong></p>
+<ul>
+<li>Gateway at :8000: browse <code>InjectionMoldingMachine</code>, call <code>AddJob</code> + <code>Start</code>, watch values change.</li>
+<li>Point out that nothing reaches MQTT yet.</li>
+</ul>
+<hr>
+<h2 id="step-1-opc-ua--mqtt-demo_01">Step 1: OPC UA → MQTT (<code>demo_01</code>)</h2>
+<p><strong>Changes</strong></p>
+<ol>
+<li>
+<p><strong>New file <code>demonstrator/imm_01.json</code></strong>: the client config for this machine.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;machine_name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;imm_01&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;opcua_url&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;opc.tcp://im-simulator:4840/&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;topic_root&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;uns-v1/adm/segment01/productionline01/molding&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;subscription_list&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span>
+    <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;node_id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;ns=2;s=IMM.Status.State&quot;</span><span class="hljs-punctuation">,</span>               <span class="hljs-attr">&quot;description&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;state&quot;</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;node_id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;ns=2;s=IMM.Status.StateCode&quot;</span><span class="hljs-punctuation">,</span>           <span class="hljs-attr">&quot;description&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;state_code&quot;</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;node_id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;ns=2;s=IMM.Production.CycleTime&quot;</span><span class="hljs-punctuation">,</span>       <span class="hljs-attr">&quot;description&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;cycle_time&quot;</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;node_id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;ns=2;s=IMM.Production.TargetCycleTime&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;description&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;target_cycle_time&quot;</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;node_id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;ns=2;s=IMM.Production.Order&quot;</span><span class="hljs-punctuation">,</span>           <span class="hljs-attr">&quot;description&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;order&quot;</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;node_id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;ns=2;s=IMM.Production.Article&quot;</span><span class="hljs-punctuation">,</span>         <span class="hljs-attr">&quot;description&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;article&quot;</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;node_id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;ns=2;s=IMM.Process.InjectionTime&quot;</span><span class="hljs-punctuation">,</span>      <span class="hljs-attr">&quot;description&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;injection_time&quot;</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;node_id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;ns=2;s=IMM.Process.PlasticizingTime&quot;</span><span class="hljs-punctuation">,</span>   <span class="hljs-attr">&quot;description&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;plasticizing_time&quot;</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;node_id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;ns=2;s=IMM.Production.PartStatus&quot;</span><span class="hljs-punctuation">,</span>      <span class="hljs-attr">&quot;description&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;part_status&quot;</span> <span class="hljs-punctuation">}</span>
+  <span class="hljs-punctuation">]</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+<p>Talking points: stable string node ids; <code>topic_root</code> follows the UNS hierarchy (enterprise/site/segment/line/cell).</p>
+</li>
+<li>
+<p><strong><code>compose-demonstrator.yml</code></strong>: uncomment and complete the <code>imm-client</code> service.</p>
+<pre><code class="language-yaml"><span class="hljs-attr">imm-client:</span>
+  <span class="hljs-attr">container_name:</span> <span class="hljs-string">imm-client</span>
+  <span class="hljs-attr">image:</span> <span class="hljs-string">opcua-client:latest</span>
+  <span class="hljs-attr">environment:</span>
+    <span class="hljs-attr">MQTT_BROKER:</span> <span class="hljs-string">mqtt-broker</span>
+    <span class="hljs-attr">MQTT_PORT:</span> <span class="hljs-string">&#x27;1883&#x27;</span>
+  <span class="hljs-attr">restart:</span> <span class="hljs-string">on-failure</span>
+  <span class="hljs-attr">depends_on:</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-string">im-simulator</span>
+  <span class="hljs-attr">volumes:</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-string">./demonstrator/imm_01.json:/app/config.json:ro</span>
+</code></pre>
+<p>Talking point: same image for every machine; only the mounted config differs.</p>
+</li>
+</ol>
+<p><strong>Apply</strong></p>
+<pre><code class="language-bash">docker compose -p demonstrator -f compose-demonstrator.yml up -d
+docker logs -f imm-client          <span class="hljs-comment"># shows &quot;[push] ... = ...&quot; lines</span>
+</code></pre>
+<p><strong>Show</strong></p>
+<pre><code class="language-bash">docker <span class="hljs-built_in">exec</span> mqtt-broker mosquitto_sub -t <span class="hljs-string">&#x27;uns-v1/#&#x27;</span> -v
+</code></pre>
+<hr>
+<h2 id="step-2-mqtt--redis-demo_02">Step 2: MQTT → Redis (<code>demo_02</code>)</h2>
+<p><strong>Changes</strong></p>
+<ol>
+<li>
+<p><strong><code>demonstrator/imm_01.json</code></strong>: rename the site level of the topic.</p>
+<pre><code class="language-diff"><span class="hljs-deletion">- &quot;topic_root&quot;: &quot;uns-v1/adm/segment01/productionline01/molding&quot;,</span>
+<span class="hljs-addition">+ &quot;topic_root&quot;: &quot;uns-v1/demonstrator/segment01/productionline01/molding&quot;,</span>
+</code></pre>
+</li>
+<li>
+<p><strong>New file <code>pipelines/general/mqtt_redis.yaml</code></strong>: Redpanda Connect bridge that keeps the latest value of every tag in one Redis hash per workcell.</p>
+<pre><code class="language-yaml"><span class="hljs-attr">input:</span>
+  <span class="hljs-attr">mqtt:</span>
+    <span class="hljs-attr">urls:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">mqtt://mqtt-broker:1883</span>
+    <span class="hljs-attr">client_id:</span> <span class="hljs-string">${MQTT_CLIENT_ID:redis-bridge-connect-01}</span>
+    <span class="hljs-attr">topics:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">uns-v1/+/+/+/+/+/+/+</span>
+    <span class="hljs-attr">qos:</span> <span class="hljs-number">0</span>
+
+<span class="hljs-attr">pipeline:</span>
+  <span class="hljs-attr">processors:</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">mapping:</span> <span class="hljs-string">|
+        let parts = metadata(&quot;mqtt_topic&quot;).split(&quot;/&quot;)
+        meta hash_name = &quot;workcell:&quot; + $parts.index(-2)
+        root = { $parts.index(-1): this.value.not_null().string() }
+</span>
+<span class="hljs-attr">output:</span>
+  <span class="hljs-attr">redis_hash:</span>
+    <span class="hljs-attr">url:</span> <span class="hljs-string">redis://redis:6379</span>
+    <span class="hljs-attr">key:</span> <span class="hljs-string">${!</span> <span class="hljs-string">metadata(&quot;hash_name&quot;)</span> <span class="hljs-string">}</span>
+    <span class="hljs-attr">walk_json_object:</span> <span class="hljs-literal">true</span>
+</code></pre>
+<p>Talking points: the filter has 8 levels (<code>uns-v1</code> + 7 <code>+</code>) to match the client's topics; hash key <code>workcell:imm_01</code>; field name = last topic level; values are stored as strings.</p>
+</li>
+<li>
+<p><strong>New file <code>compose-pipelines.yml</code></strong>: separate stack for all pipelines, on the same external network.</p>
+<pre><code class="language-yaml"><span class="hljs-attr">services:</span>
+  <span class="hljs-attr">pipeline-mqtt-redis:</span>
+    <span class="hljs-attr">container_name:</span> <span class="hljs-string">pipeline-mqtt-redis</span>
+    <span class="hljs-attr">image:</span> <span class="hljs-string">docker.redpanda.com/redpandadata/connect:latest</span>
+    <span class="hljs-attr">command:</span> <span class="hljs-string">run</span> <span class="hljs-string">/pipelines/general/mqtt_redis.yaml</span>
+    <span class="hljs-attr">volumes:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">./pipelines:/pipelines:ro</span>
+
+<span class="hljs-attr">networks:</span>
+  <span class="hljs-attr">default:</span>
+    <span class="hljs-attr">name:</span> <span class="hljs-string">demonstrator</span>
+    <span class="hljs-attr">external:</span> <span class="hljs-literal">true</span>
+</code></pre>
+</li>
+<li>
+<p><strong><code>startup.sh</code></strong>: append the pipeline stack.</p>
+<pre><code class="language-bash"><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;::: Starting pipeline stack :::&quot;</span>
+docker compose -p pipelines -f compose-pipelines.yml up -d
+<span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;Pipelines stack is up&quot;</span>
+</code></pre>
+</li>
+<li>
+<p><strong><code>shutdown.sh</code></strong>: stop the pipeline stack <strong>first</strong>, before the demonstrator stack.</p>
+<pre><code class="language-bash"><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;::: Stopping pipeline stack :::&quot;</span>
+<span class="hljs-keyword">if</span> ! docker compose -p pipelines -f compose-pipelines.yml down; <span class="hljs-keyword">then</span>
+  <span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;Failed to stop pipeline stack&quot;</span> &gt;&amp;2
+  status=1
+<span class="hljs-keyword">fi</span>
+</code></pre>
+</li>
+</ol>
+<p><strong>Apply</strong></p>
+<pre><code class="language-bash">docker restart imm-client     <span class="hljs-comment"># the client reads its config only at startup</span>
+docker compose -p pipelines -f compose-pipelines.yml up -d
+</code></pre>
+<blockquote>
+<p>Note: retained messages under the old <code>uns-v1/adm/...</code> topics stay in the broker. Clear them, or ignore them, since they don't match later filters.</p>
+</blockquote>
+<p><strong>Show</strong></p>
+<pre><code class="language-bash">docker <span class="hljs-built_in">exec</span> redis redis-cli HGETALL workcell:imm_01
+</code></pre>
+<p>or RedisInsight at :5540; change a job in the gateway and watch <code>order</code> / <code>article</code> update.</p>
+<hr>
+<h2 id="step-3-hydration--redpanda-demo_03">Step 3: Hydration → Redpanda (<code>demo_03</code>)</h2>
+<p><strong>Changes</strong></p>
+<ol>
+<li>
+<p><strong>New file <code>pipelines/performance/hydration.yaml</code></strong>: each new cycle time triggers one enriched event. The context (order, article, setpoints) is looked up from Redis.</p>
+<pre><code class="language-yaml"><span class="hljs-attr">input:</span>
+  <span class="hljs-attr">mqtt:</span>
+    <span class="hljs-attr">urls:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">mqtt://mqtt-broker:1883</span>
+    <span class="hljs-attr">topics:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">uns-v1/+/segment01/+/+/+/+/cycle_time</span>
+    <span class="hljs-attr">qos:</span> <span class="hljs-number">1</span>
+
+<span class="hljs-attr">pipeline:</span>
+  <span class="hljs-attr">processors:</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">mapping:</span> <span class="hljs-string">|
+        let workcell = metadata(&quot;mqtt_topic&quot;).split(&quot;/&quot;).index(-2)
+        meta workcell = $workcell
+        root.workcell = $workcell
+        root.plant = metadata(&quot;mqtt_topic&quot;).split(&quot;/&quot;).index(1)
+        root.segment = metadata(&quot;mqtt_topic&quot;).split(&quot;/&quot;).index(2)
+        root.productionLine = metadata(&quot;mqtt_topic&quot;).split(&quot;/&quot;).index(3)
+        root.cycle_time = this.value.number()
+        root.timestamp = this.timestamp
+</span>    <span class="hljs-bullet">-</span> <span class="hljs-attr">branch:</span>
+        <span class="hljs-attr">processors:</span>
+          <span class="hljs-bullet">-</span> <span class="hljs-attr">redis:</span>
+              <span class="hljs-attr">url:</span> <span class="hljs-string">redis://redis:6379</span>
+              <span class="hljs-attr">command:</span> <span class="hljs-string">hmget</span>
+              <span class="hljs-attr">args_mapping:</span> <span class="hljs-string">root</span> <span class="hljs-string">=</span> [ <span class="hljs-string">&quot;workcell:&quot;</span> <span class="hljs-string">+</span> <span class="hljs-string">metadata(&quot;workcell&quot;)</span>, <span class="hljs-string">&quot;order&quot;</span>, <span class="hljs-string">&quot;article&quot;</span>, <span class="hljs-string">&quot;target_cycle_time&quot;</span>, <span class="hljs-string">&quot;plasticizing_time&quot;</span>, <span class="hljs-string">&quot;injection_time&quot;</span>]
+        <span class="hljs-attr">result_map:</span> <span class="hljs-string">|
+          root.order = this.index(0)
+          root.article = this.index(1)
+          root.target_cycle_time = this.index(2).number()
+          root.plasticizing_time = this.index(3).number()
+          root.injection_time = this.index(4).number()
+</span>
+<span class="hljs-attr">output:</span>
+  <span class="hljs-attr">redpanda:</span>
+    <span class="hljs-attr">seed_brokers:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">redpanda-0:9092</span>
+    <span class="hljs-attr">topic:</span> <span class="hljs-string">data_product_performance</span>
+    <span class="hljs-attr">key:</span> <span class="hljs-string">${!</span> <span class="hljs-string">metadata(&quot;workcell&quot;)</span> <span class="hljs-string">}</span>
+</code></pre>
+<p>Talking points:</p>
+<ul>
+<li>The topic filter must have <strong>8 levels</strong> like the published topic. <code>+</code> matches exactly one level, and a wrong filter fails silently with no errors in the log.</li>
+<li><code>branch</code> keeps the original message and merges the Redis lookup into it via <code>result_map</code>.</li>
+<li>Redis returns strings, so <code>.number()</code> converts them back.</li>
+<li>The message key is the workcell, so all events of one machine go to the same partition, in order.</li>
+</ul>
+</li>
+<li>
+<p><strong><code>compose-pipelines.yml</code></strong>: add the service.</p>
+<pre><code class="language-yaml"><span class="hljs-attr">pipeline-performance-hydration:</span>
+  <span class="hljs-attr">container_name:</span> <span class="hljs-string">pipeline-performance-hydration</span>
+  <span class="hljs-attr">image:</span> <span class="hljs-string">docker.redpanda.com/redpandadata/connect:latest</span>
+  <span class="hljs-attr">command:</span> <span class="hljs-string">run</span> <span class="hljs-string">/pipelines/performance/hydration.yaml</span>
+  <span class="hljs-attr">volumes:</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-string">./pipelines:/pipelines:ro</span>
+</code></pre>
+</li>
+<li>
+<p><strong><code>compose-demonstrator.yml</code></strong>: cosmetic only (<code>restart: on-failure</code> moved below <code>depends_on</code>). No need to show this live.</p>
+</li>
+</ol>
+<p><strong>Apply</strong></p>
+<pre><code class="language-bash">docker compose -p pipelines -f compose-pipelines.yml up -d
+</code></pre>
+<p><strong>Show</strong></p>
+<ul>
+<li>Redpanda Console at :8080 → Topics → <code>data_product_performance</code>: one message per cycle (about every 15 s while running).</li>
+<li>CLI alternative: <code>docker exec redpanda-0 rpk topic consume data_product_performance -n 3</code></li>
+</ul>
+<hr>
+<h2 id="step-4-redpanda--timescaledb-demo_04">Step 4: Redpanda → TimescaleDB (<code>demo_04</code>)</h2>
+<p><strong>Changes</strong></p>
+<ol>
+<li>
+<p><strong>New file <code>demonstrator/create_table.sql</code></strong>: target table as a hypertable.</p>
+<pre><code class="language-sql"><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> IF <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">EXISTS</span> data_product_performance (
+    ts                 TIMESTAMPTZ      <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span>,  <span class="hljs-comment">-- &quot;timestamp&quot;</span>
+    plant              TEXT             <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span>,
+    segment            TEXT             <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span>,
+    production_line    TEXT             <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span>,  <span class="hljs-comment">-- &quot;productionLine&quot;</span>
+    workcell           TEXT             <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span>,
+    order_no           TEXT,                       <span class="hljs-comment">-- &quot;order&quot;</span>
+    article            TEXT,
+    cycle_time         <span class="hljs-type">DOUBLE PRECISION</span>,
+    target_cycle_time  <span class="hljs-type">DOUBLE PRECISION</span>,
+    injection_time     <span class="hljs-type">DOUBLE PRECISION</span>,
+    plasticizing_time  <span class="hljs-type">DOUBLE PRECISION</span>
+);
+
+<span class="hljs-keyword">SELECT</span> create_hypertable(<span class="hljs-string">&#x27;data_product_performance&#x27;</span>, by_range(<span class="hljs-string">&#x27;ts&#x27;</span>), if_not_exists <span class="hljs-operator">=</span><span class="hljs-operator">&gt;</span> <span class="hljs-literal">TRUE</span>);
+
+<span class="hljs-keyword">CREATE</span> INDEX IF <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">EXISTS</span> data_product_performance_workcell_ts_idx
+    <span class="hljs-keyword">ON</span> data_product_performance (workcell, ts <span class="hljs-keyword">DESC</span>);
+</code></pre>
+<p>Talking points: <code>order</code> → <code>order_no</code> (reserved word), <code>timestamp</code> → <code>ts</code>, camelCase → snake_case.</p>
+</li>
+<li>
+<p><strong>New file <code>pipelines/performance/insert.yaml</code></strong>: consume the data product and batch-insert it.</p>
+<pre><code class="language-yaml"><span class="hljs-attr">input:</span>
+  <span class="hljs-attr">redpanda:</span>
+    <span class="hljs-attr">seed_brokers:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">redpanda-0:9092</span>
+    <span class="hljs-attr">topics:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">data_product_performance</span>
+    <span class="hljs-attr">consumer_group:</span> <span class="hljs-string">performance</span>
+    <span class="hljs-attr">start_from_oldest:</span> <span class="hljs-literal">true</span>
+
+<span class="hljs-attr">output:</span>
+  <span class="hljs-attr">sql_insert:</span>
+    <span class="hljs-attr">driver:</span> <span class="hljs-string">postgres</span>
+    <span class="hljs-attr">dsn:</span> <span class="hljs-string">postgres://demonstrator:demonstrator@timescaledb:5432/postgres?sslmode=disable</span>
+    <span class="hljs-attr">table:</span> <span class="hljs-string">data_product_performance</span>
+    <span class="hljs-attr">columns:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">ts</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">plant</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">segment</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">production_line</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">workcell</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">order_no</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">article</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">cycle_time</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">target_cycle_time</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">injection_time</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">plasticizing_time</span>
+    <span class="hljs-attr">args_mapping:</span> <span class="hljs-string">|
+      root = [
+        this.timestamp,
+        this.plant,
+        this.segment,
+        this.productionLine,
+        this.workcell,
+        this.order.catch(null),
+        this.article.catch(null),
+        this.cycle_time.number().catch(null),
+        this.target_cycle_time.number().catch(null),
+        this.injection_time.number().catch(null),
+        this.plasticizing_time.number().catch(null)
+      ]
+</span>    <span class="hljs-attr">batching:</span>
+      <span class="hljs-attr">count:</span> <span class="hljs-number">100</span>
+      <span class="hljs-attr">period:</span> <span class="hljs-string">15s</span>
+</code></pre>
+<p>Talking points:</p>
+<ul>
+<li>The consumer group plus <code>start_from_oldest</code> means everything produced since step 3 is backfilled.</li>
+<li>Batching writes at most every 15 s, or every 100 messages.</li>
+<li><code>.catch(null)</code> stores <code>NULL</code> instead of failing the insert.</li>
+</ul>
+</li>
+<li>
+<p><strong><code>compose-pipelines.yml</code></strong>: add the service.</p>
+<pre><code class="language-yaml"><span class="hljs-attr">pipeline-performance-insert:</span>
+  <span class="hljs-attr">container_name:</span> <span class="hljs-string">pipeline-performance-insert</span>
+  <span class="hljs-attr">image:</span> <span class="hljs-string">docker.redpanda.com/redpandadata/connect:latest</span>
+  <span class="hljs-attr">command:</span> <span class="hljs-string">run</span> <span class="hljs-string">/pipelines/performance/insert.yaml</span>
+  <span class="hljs-attr">volumes:</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-string">./pipelines:/pipelines:ro</span>
+</code></pre>
+</li>
+</ol>
+<p><strong>Apply</strong> (create the table <strong>before</strong> starting the pipeline; nothing runs the SQL automatically)</p>
+<pre><code class="language-bash">docker <span class="hljs-built_in">exec</span> -i timescaledb psql -U demonstrator -d postgres &lt; demonstrator/create_table.sql
+docker compose -p pipelines -f compose-pipelines.yml up -d
+</code></pre>
+<p><strong>Show</strong></p>
+<pre><code class="language-bash">docker <span class="hljs-built_in">exec</span> timescaledb psql -U demonstrator -d postgres \
+  -c <span class="hljs-string">&quot;SELECT ts, workcell, order_no, cycle_time, target_cycle_time FROM data_product_performance ORDER BY ts DESC LIMIT 5;&quot;</span>
+</code></pre>
+<p>or pgAdmin at :5050 / a Grafana panel at :3000 (TimescaleDB is the default data source).</p>
+<hr>
+<h2 id="pitfalls-to-watch-for-during-the-live-session">Pitfalls to watch for during the live session</h2>
+<ul>
+<li><strong>Client started before the simulator was ready:</strong> the first connection can be refused, and <code>restart: on-failure</code> recovers it. If <code>imm-client</code> connects but its log stops showing <code>[push]</code> lines, run <code>docker restart imm-client</code>.</li>
+<li><strong>Topic levels:</strong> the client publishes <code>.../molding/imm_01/imm_01/&lt;tag&gt;</code> (machine name twice, 8 levels). Every MQTT filter has to match that.</li>
+<li><strong>Config changes in <code>imm_01.json</code></strong> only take effect after restarting <code>imm-client</code>.</li>
+<li><strong>Table already exists</strong> from a rehearsal: <code>CREATE TABLE IF NOT EXISTS</code> won't change its columns. Drop it first if the schema changed.</li>
+<li><strong>Reset between rehearsals:</strong> <code>./shutdown.sh</code>. Named volumes (Redis, Redpanda, TimescaleDB, Grafana, pgAdmin) keep their data. Use <code>docker volume rm</code> for a clean slate.</li>
+</ul>
+
+            <script async src="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.js"></script>
+            
+        </body>
+        </html>
